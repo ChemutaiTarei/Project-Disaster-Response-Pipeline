@@ -26,11 +26,11 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+engine = create_engine('sqlite:///../desktop/Project_Disaster_Response_Pipeline/Disaster_Reponse.db')
+df = pd.read_sql_table('Disaster_Reponse', engine)
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+model = joblib.load("../desktop/Project_Disaster_Response_Pipeline/model.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -42,6 +42,13 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+
+    water_count = df[df['category'] == 'water'].shape[0]
+    food_count = df[df['category'] == 'food'].shape[0]
+    shelter_count = df[df['category'] == 'shelter'].shape[0]
+    fire_count = df[df['category'] == 'fire'].shape[0]
+    storm_count = df[df['category'] == 'storm'].shape[0]
+    flood_count = df[df['category'] == 'flood'].shape[0]
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -66,6 +73,49 @@ def index():
         }
     ]
     
+
+    graph1 = {
+        'data': [
+            Bar(
+                x=['Water', 'Food', 'Shelter'],
+                y=[water_count, food_count, shelter_count]
+            )
+        ],
+        'layout': {
+            'title': 'Distribution of Basic Needs',
+            'yaxis': {
+                'title': "Count"
+            },
+            'xaxis': {
+                'title': "Category"
+            }
+        }
+    }
+    
+    graph2 = {
+        'data': [
+            Bar(
+                x=['Fire', 'Storm', 'Flood'],
+                y=[fire_count, storm_count, flood_count]
+            )
+        ],
+        'layout': {
+            'title': 'Distribution of Natural Disasters',
+            'yaxis': {
+                'title': "Count"
+            },
+            'xaxis': {
+                'title': "Category"
+            }
+        }
+    }
+    
+    # Create a list of graphs
+    graphs = [graph1, graph2]
+
+
+
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
